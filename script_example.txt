@@ -1,0 +1,79 @@
+import cv2
+import os
+from PIL import Image
+
+def extract_frames(video_path, timestamps, output_folder):
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+    
+    cap = cv2.VideoCapture(video_path)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    extracted_images = []
+
+    for i, ts in enumerate(timestamps):
+        # Normalizar formato (por si viene con puntos o falta el 0 inicial)
+        ts_clean = ts.replace('.', ':')
+        parts = ts_clean.split(':')
+        minutes = int(parts[0])
+        seconds = int(parts[1])
+        
+        frame_id = int((minutes * 60 + seconds) * fps)
+        cap.set(cv2.CAP_PROP_POS_FRAMES, frame_id)
+        ret, frame = cap.read()
+        
+        if ret:
+            # Convertir de BGR (OpenCV) a RGB (Pillow)
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            img = Image.fromarray(frame_rgb)
+            
+            # Guardar imagen individual
+            filename = f"{output_folder}/paso_{i+1}_{ts_clean.replace(':', '-')}.jpg"
+            img.save(filename)
+            extracted_images.append(img)
+            print(f"Capturado: {filename}")
+    
+    cap.release()
+    return extracted_images
+
+def create_animated_carousel(images, output_name, duration_per_slide=2000, fade_frames=10):
+    """
+    Crea una secuencia con efecto de fundido (fade).
+    - duration_per_slide: milisegundos que se queda fija la imagen.
+    - fade_frames: cuántos frames intermedios usar para el difuminado.
+    """
+    if not images:
+        return
+
+    sequence = []
+    
+    for i in range(len(images)):
+        current_img = images[i]
+        next_img = images[(i + 1) % len(images)] # Para que sea infinito
+
+        # 1. Añadir la imagen fija (se repite para dar tiempo a leerla)
+        for _ in range(20): # Duración de la imagen estática
+            sequence.append(current_img)
+
+        # 2. Generar los frames de transición (Fade Out / In)
+        for f in range(fade_frames):
+            alpha = f / float(fade_frames)
+            # Mezclamos la imagen actual con la siguiente
+            blended = Image.blend(current_img, next_img, alpha)
+            sequence.append(blended)
+
+    # Guardar como GIF (es más compatible con GitHub/GitLab para PRs que APNG)
+    sequence[0].save(
+        output_name,
+        save_all=True,
+        append_images=sequence[1:],
+        duration=100, # Velocidad de la animación (ms)
+        loop=0
+    )
+    print(f"\n✨ Carrusel listo para el PR: {output_name}")
+
+# Timestamps corregidos
+key_moments = ["00:03", "00:12", "00:23", "00:45", "01:09", "01:37", "01:48", "01:50", "02:24", "02:40", "02:44","03:29", "03:46", "04:14", "04:26", "04:29", "04:37", "04:42"]
+
+# Ejecución
+imgs = extract_frames("novudi_01.mp4", key_moments, "storyboard_novudi")
+create_animated_carousel(imgs, "prueba_verificacion_novudi.gif")
