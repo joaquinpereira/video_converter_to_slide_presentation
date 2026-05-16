@@ -3,10 +3,12 @@ import sys
 import subprocess
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                              QPushButton, QCheckBox, QProgressBar, QMessageBox, QFrame)
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 from processor import RenderThread
 
 class SummaryView(QWidget):
+    back_requested = pyqtSignal()
+
     def __init__(self, model):
         super().__init__()
         self.model = model
@@ -69,6 +71,10 @@ class SummaryView(QWidget):
         # Botones
         btn_layout = QHBoxLayout()
         
+        self.btn_back = QPushButton("⬅️ Regresar")
+        self.btn_back.setStyleSheet("background-color: #757575; color: white; font-weight: bold; padding: 15px; font-size: 16px; border-radius: 8px;")
+        self.btn_back.clicked.connect(self.back_requested.emit)
+        
         self.btn_process = QPushButton("🚀 Procesar Slideshow")
         self.btn_process.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_process.setStyleSheet("""
@@ -91,6 +97,7 @@ class SummaryView(QWidget):
         self.btn_open_folder.clicked.connect(self.open_output_folder)
         self.btn_open_folder.hide()
         
+        btn_layout.addWidget(self.btn_back)
         btn_layout.addStretch()
         btn_layout.addWidget(self.btn_process)
         btn_layout.addWidget(self.btn_open_folder)
@@ -125,6 +132,13 @@ class SummaryView(QWidget):
     def update_model_options(self):
         self.model.export_gif = self.chk_gif.isChecked()
         self.model.export_mp4 = self.chk_mp4.isChecked()
+        has_selection = self.model.export_gif or self.model.export_mp4
+        
+        self.btn_process.setEnabled(has_selection)
+        if not has_selection:
+            self.lbl_status.setText("⚠️ Selecciona al menos un formato para procesar.")
+        else:
+            self.lbl_status.setText("Listo para procesar.")
 
     def start_processing(self):
         if not self.model.export_gif and not self.model.export_mp4:
@@ -134,6 +148,7 @@ class SummaryView(QWidget):
         self.btn_process.setEnabled(False)
         self.chk_gif.setEnabled(False)
         self.chk_mp4.setEnabled(False)
+        self.btn_back.setEnabled(False)
         self.progress_bar.show()
         self.progress_bar.setValue(0)
         self.btn_open_folder.hide()
@@ -152,6 +167,7 @@ class SummaryView(QWidget):
         self.progress_bar.setValue(100)
         self.chk_gif.setEnabled(True)
         self.chk_mp4.setEnabled(True)
+        self.btn_back.setEnabled(True)
         
         if success:
             self.lbl_status.setText("¡Completado! " + msg.replace("\n", " "))
