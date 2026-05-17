@@ -17,3 +17,5 @@ class AppModel:
     export_mp4: bool = False
     project_filepath: str = ""
     transition_effect: str = "Fade (Fundido)"
+    export_resolution: str = "Original"
+    export_fps: int = 30

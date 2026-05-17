@@ -13,9 +13,11 @@ class RenderThread(QThread):
     def __init__(self, model, preview_mode=False, preview_size=None):
         super().__init__()
         self.model = model
+        self.fps = getattr(self.model, 'export_fps', 30)
         self.preview_mode = preview_mode
         self.preview_size = preview_size
-        self.fps = 15 if preview_mode else 30 # Menos FPS en preview para rendimiento en tiempo real
+        if self.preview_mode:
+            self.fps = 15
         self.transition_time = 0.5
 
     def emit_preview(self, pil_img):
@@ -33,11 +35,19 @@ class RenderThread(QThread):
                 self.finished.emit(False, "No hay imágenes para procesar.")
                 return
 
+            res_str = getattr(self.model, 'export_resolution', 'Original')
+            target_size = None
+            if "1920x1080" in res_str: target_size = (1920, 1080)
+            elif "1280x720" in res_str: target_size = (1280, 720)
+            elif "854x480" in res_str: target_size = (854, 480)
+
             # Cargar imágenes
             pil_images = []
             for slide in self.model.images:
                 if os.path.exists(slide.file_path):
                     img = Image.open(slide.file_path).convert("RGB")
+                    if target_size and img.size != target_size:
+                        img = img.resize(target_size, Image.Resampling.LANCZOS)
                     pil_images.append((img, slide.duration_custom))
 
             if not pil_images:
@@ -100,11 +110,23 @@ class RenderThread(QThread):
 
             # --- EXPORTACIÓN ---
             output_dir = self.model.save_location
-            proj_name = self.model.project_name.replace(" ", "_")
+            proj_name = self.model.project_name.replace(' ', '_')
+            
+            import datetime
+            now_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            res_str_full = getattr(self.model, 'export_resolution', 'Original')
+            if "1080" in res_str_full: res_suffix = "1080p"
+            elif "720" in res_str_full: res_suffix = "720p"
+            elif "480" in res_str_full: res_suffix = "480p"
+            else: res_suffix = "Original"
+            
+            suffix = f"_{res_suffix}_{self.fps}fps_{now_str}"
+            base_filename = f"{proj_name}{suffix}"
+            
             msg_final = ""
-
+            
             if self.model.export_mp4:
-                mp4_path = os.path.join(output_dir, f"{proj_name}.mp4")
+                mp4_path = os.path.join(output_dir, f"{base_filename}.mp4")
                 self.progress.emit(45, "Codificando Video MP4 (Esto puede tardar)...")
                 
                 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -122,23 +144,13 @@ class RenderThread(QThread):
                 msg_final += f"✅ Video MP4 creado.\n"
 
             if self.model.export_gif:
-                gif_path = os.path.join(output_dir, f"{proj_name}.gif")
-                self.progress.emit(75, "Compilando archivo GIF...")
-                
-                skip_frames = 3
-                gif_sequence = sequence[::skip_frames]
-                gif_duration = int(1000 / (self.fps / skip_frames))
-                
-                gif_w, gif_h = int(base_width * 0.5), int(base_height * 0.5)
-                self.progress.emit(85, "Redimensionando frames para el GIF...")
-                gif_sequence = [img.resize((gif_w, gif_h), Image.Resampling.LANCZOS) for img in gif_sequence]
-                
-                self.progress.emit(95, "Guardando GIF en disco...")
-                gif_sequence[0].save(
+                self.progress.emit(90, "Guardando archivo GIF (esto puede tardar)...")
+                gif_path = os.path.join(output_dir, f"{base_filename}.gif")
+                sequence[0].save(
                     gif_path,
                     save_all=True,
-                    append_images=gif_sequence[1:],
-                    duration=gif_duration,
+                    append_images=sequence[1:],
+                    duration=int(1000 / self.fps),
                     loop=0,
                     optimize=True
                 )

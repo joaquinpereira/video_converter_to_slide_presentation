@@ -2,7 +2,7 @@ import os
 import sys
 import subprocess
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
-                             QPushButton, QCheckBox, QProgressBar, QMessageBox, QFrame)
+                             QPushButton, QCheckBox, QProgressBar, QMessageBox, QFrame, QComboBox)
 from PyQt6.QtCore import Qt, pyqtSignal
 from processor import RenderThread
 
@@ -38,6 +38,32 @@ class SummaryView(QWidget):
         
         summary_frame.setLayout(summary_layout)
         layout.addWidget(summary_frame)
+        
+        # Ajustes de Calidad
+        quality_layout = QHBoxLayout()
+        quality_layout.setSpacing(15)
+        
+        lbl_res = QLabel("Resolución:")
+        lbl_res.setStyleSheet("font-weight: bold; color: #333;")
+        self.combo_res = QComboBox()
+        self.combo_res.addItems(["Original", "1920x1080 (FHD)", "1280x720 (HD)", "854x480 (SD)"])
+        self.combo_res.currentIndexChanged.connect(self.update_model_options)
+        self.combo_res.setCursor(Qt.CursorShape.PointingHandCursor)
+        
+        lbl_fps = QLabel("Fotogramas (FPS):")
+        lbl_fps.setStyleSheet("font-weight: bold; color: #333;")
+        self.combo_fps = QComboBox()
+        self.combo_fps.addItems(["15", "24", "30", "60"])
+        self.combo_fps.setCurrentText("30")
+        self.combo_fps.currentIndexChanged.connect(self.update_model_options)
+        self.combo_fps.setCursor(Qt.CursorShape.PointingHandCursor)
+        
+        quality_layout.addWidget(lbl_res)
+        quality_layout.addWidget(self.combo_res)
+        quality_layout.addWidget(lbl_fps)
+        quality_layout.addWidget(self.combo_fps)
+        quality_layout.addStretch()
+        layout.addLayout(quality_layout)
 
         # Opciones de exportación
         options_layout = QHBoxLayout()
@@ -124,6 +150,14 @@ class SummaryView(QWidget):
         self.chk_gif.setChecked(self.model.export_gif)
         self.chk_mp4.setChecked(self.model.export_mp4)
         
+        self.combo_res.blockSignals(True)
+        self.combo_res.setCurrentText(getattr(self.model, 'export_resolution', 'Original'))
+        self.combo_res.blockSignals(False)
+        
+        self.combo_fps.blockSignals(True)
+        self.combo_fps.setCurrentText(str(getattr(self.model, 'export_fps', 30)))
+        self.combo_fps.blockSignals(False)
+        
         self.progress_bar.hide()
         self.progress_bar.setValue(0)
         self.lbl_status.setText("Listo para procesar.")
@@ -133,6 +167,8 @@ class SummaryView(QWidget):
     def update_model_options(self):
         self.model.export_gif = self.chk_gif.isChecked()
         self.model.export_mp4 = self.chk_mp4.isChecked()
+        self.model.export_resolution = self.combo_res.currentText()
+        self.model.export_fps = int(self.combo_fps.currentText())
         has_selection = self.model.export_gif or self.model.export_mp4
         
         self.data_changed.emit()

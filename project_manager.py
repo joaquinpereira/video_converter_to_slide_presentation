@@ -27,6 +27,8 @@ class ProjectManager:
             "export_mp4": model.export_mp4,
             "export_gif": model.export_gif,
             "transition_effect": getattr(model, 'transition_effect', 'Ninguno'),
+            "export_resolution": getattr(model, 'export_resolution', 'Original'),
+            "export_fps": getattr(model, 'export_fps', 30),
             "images": []
         }
         
@@ -96,6 +98,8 @@ class ProjectManager:
         model.export_mp4 = data.get("export_mp4", True)
         model.export_gif = data.get("export_gif", True)
         model.transition_effect = data.get("transition_effect", "Ninguno")
+        model.export_resolution = data.get("export_resolution", "Original")
+        model.export_fps = data.get("export_fps", 30)
         
         model.images = []
         import tempfile
