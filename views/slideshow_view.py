@@ -9,6 +9,7 @@ from PyQt6.QtGui import QIcon, QPixmap, QImage
 class SlideshowView(QWidget):
     next_requested = pyqtSignal()
     back_requested = pyqtSignal()
+    data_changed = pyqtSignal()
 
     def __init__(self, model):
         super().__init__()
@@ -58,6 +59,7 @@ class SlideshowView(QWidget):
             "Ninguno"
         ])
         self.combo_effect.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.combo_effect.currentIndexChanged.connect(self.on_effect_changed)
         
         self.btn_play_all = QPushButton("▶️ Play All")
         self.btn_play_all.setStyleSheet("background-color: #ff9800; font-weight: bold; padding: 6px;")
@@ -183,6 +185,7 @@ class SlideshowView(QWidget):
             item.setText(f"Slide {i+1}\n[{slide.timestamp}]")
             
         self.on_item_selected()
+        self.data_changed.emit()
 
     def on_item_selected(self):
         items = self.list_widget.selectedItems()
@@ -217,6 +220,11 @@ class SlideshowView(QWidget):
     def on_duration_changed(self, value):
         if self.selected_index >= 0:
             self.model.images[self.selected_index].duration_custom = value
+            self.data_changed.emit()
+
+    def on_effect_changed(self):
+        self.model.transition_effect = self.combo_effect.currentText()
+        self.data_changed.emit()
 
     def delete_slide(self):
         if self.selected_index >= 0:
@@ -225,6 +233,7 @@ class SlideshowView(QWidget):
             if resp == QMessageBox.StandardButton.Yes:
                 del self.model.images[self.selected_index]
                 self.load_images()
+                self.data_changed.emit()
 
     def play_all(self):
         if not self.model.images: 

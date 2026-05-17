@@ -8,6 +8,7 @@ from processor import RenderThread
 
 class SummaryView(QWidget):
     back_requested = pyqtSignal()
+    data_changed = pyqtSignal()
 
     def __init__(self, model):
         super().__init__()
@@ -133,6 +134,8 @@ class SummaryView(QWidget):
         self.model.export_gif = self.chk_gif.isChecked()
         self.model.export_mp4 = self.chk_mp4.isChecked()
         has_selection = self.model.export_gif or self.model.export_mp4
+        
+        self.data_changed.emit()
         
         self.btn_process.setEnabled(has_selection)
         if not has_selection:

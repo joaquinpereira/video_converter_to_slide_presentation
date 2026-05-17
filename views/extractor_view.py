@@ -6,6 +6,16 @@ from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QVariantAnimation, QSize
 from PyQt6.QtGui import QImage, QPixmap, QIcon
 from model import SlideImage
 
+from PyQt6.QtWidgets import QStyle
+
+class ClickableSlider(QSlider):
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            val = QStyle.sliderValueFromPosition(self.minimum(), self.maximum(), event.position().toPoint().x(), self.width())
+            self.setValue(val)
+            self.sliderMoved.emit(val)
+        super().mousePressEvent(event)
+
 class VideoLabel(QLabel):
     double_clicked = pyqtSignal()
     def mouseDoubleClickEvent(self, event):
@@ -14,6 +24,7 @@ class VideoLabel(QLabel):
 
 class ExtractorView(QWidget):
     next_requested = pyqtSignal()
+    data_changed = pyqtSignal()
 
     def __init__(self, model):
         super().__init__()
@@ -46,7 +57,7 @@ class ExtractorView(QWidget):
         left_panel.addWidget(self.video_label, stretch=1)
         
         timeline_layout = QHBoxLayout()
-        self.slider = QSlider(Qt.Orientation.Horizontal)
+        self.slider = ClickableSlider(Qt.Orientation.Horizontal)
         self.slider.setRange(0, 100)
         self.slider.sliderMoved.connect(self.set_position)
         self.slider.sliderPressed.connect(self.pause_video)
@@ -68,7 +79,10 @@ class ExtractorView(QWidget):
         self.btn_play_pause = QPushButton("▶️ Play")
         self.btn_play_pause.clicked.connect(self.toggle_play)
         self.btn_play_pause.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_play_pause.setStyleSheet("padding: 10px 20px; font-weight: bold; font-size: 14px;")
+        self.btn_play_pause.setStyleSheet("""
+            QPushButton { background-color: #2196F3; color: white; padding: 10px 20px; font-weight: bold; font-size: 14px; }
+            QPushButton:hover { background-color: #1976D2; }
+        """)
         
         self.btn_snapshot = QPushButton("📸 Tomar Snapshot")
         self.btn_snapshot.setStyleSheet("""
@@ -155,6 +169,7 @@ class ExtractorView(QWidget):
             if resp == QMessageBox.StandardButton.Yes:
                 del self.model.images[idx]
                 self.refresh_snapshots()
+                self.data_changed.emit()
 
     def next_frame_slot(self):
         if self.cap is not None and self.cap.isOpened():
@@ -220,7 +235,8 @@ class ExtractorView(QWidget):
                 secs = total_seconds % 60
                 timestamp_str = f"{mins:02d}:{secs:02d}"
                 
-                temp_dir = os.path.join(self.model.save_location, f"{self.model.project_name}_slides")
+                import tempfile
+                temp_dir = os.path.join(tempfile.gettempdir(), "video_slides_app", self.model.project_name.replace(' ', '_'))
                 os.makedirs(temp_dir, exist_ok=True)
                 
                 filename = f"slide_{len(self.model.images)+1}_{mins:02d}-{secs:02d}.jpg"
@@ -232,6 +248,7 @@ class ExtractorView(QWidget):
                 self.model.images.append(slide)
                 self.refresh_snapshots()
                 self.shutter_flash()
+                self.data_changed.emit()
                 
             self.cap.set(cv2.CAP_PROP_POS_FRAMES, current_frame)
 

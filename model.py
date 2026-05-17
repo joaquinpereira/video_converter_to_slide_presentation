@@ -15,4 +15,5 @@ class AppModel:
     images: List[SlideImage] = field(default_factory=list)
     export_gif: bool = True
     export_mp4: bool = False
+    project_filepath: str = ""
     transition_effect: str = "Fade (Fundido)"

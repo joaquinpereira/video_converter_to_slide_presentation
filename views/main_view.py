@@ -51,6 +51,7 @@ class DropArea(QFrame):
 class MainView(QWidget):
     # Señal para comunicar al Controlador que queremos ir a la fase 2
     next_requested = pyqtSignal()
+    open_project_requested = pyqtSignal()
     
     def __init__(self, model):
         super().__init__()
@@ -96,6 +97,7 @@ class MainView(QWidget):
         self.txt_save_location.setReadOnly(True)
         self.txt_save_location.setPlaceholderText("Selecciona dónde guardar...")
         btn_browse = QPushButton("Explorar...")
+        btn_browse.setStyleSheet("background-color: #757575; color: white; padding: 12px 20px; font-weight: bold; border-radius: 6px; font-size: 14px;")
         btn_browse.setCursor(Qt.CursorShape.PointingHandCursor)
         btn_browse.clicked.connect(self.browse_save_location)
         sl_layout.addWidget(sl_label)
@@ -103,30 +105,36 @@ class MainView(QWidget):
         sl_layout.addWidget(btn_browse)
         layout.addLayout(sl_layout)
 
-        # Botón Siguiente
-        self.btn_next = QPushButton("Siguiente ➡️")
+        # Botones de Acción Principales
+        action_layout = QHBoxLayout()
+        action_layout.setSpacing(15)
+        
+        self.btn_open = QPushButton("📂 Abrir Proyecto")
+        self.btn_open.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_open.setStyleSheet("""
+            QPushButton {
+                background-color: #2196F3; color: white; padding: 12px; font-weight: bold; font-size: 16px; border-radius: 6px;
+            }
+            QPushButton:hover { background-color: #1976D2; }
+        """)
+        self.btn_open.clicked.connect(self.open_project_requested.emit)
+        
+        self.btn_next = QPushButton("🚀 Crear Proyecto")
         self.btn_next.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_next.setStyleSheet("""
             QPushButton {
-                background-color: #4CAF50; 
-                color: white;
-                font-weight: bold; 
-                padding: 10px 20px; 
-                border-radius: 5px;
-                font-size: 14px;
+                background-color: #4CAF50; color: white; font-weight: bold; padding: 12px; font-size: 16px; border-radius: 6px;
             }
-            QPushButton:disabled {
-                background-color: #a5d6a7;
-                color: #f1f1f1;
-            }
-            QPushButton:hover:!disabled {
-                background-color: #45a049;
-            }
+            QPushButton:disabled { background-color: #a5d6a7; color: #f1f1f1; }
+            QPushButton:hover:!disabled { background-color: #45a049; }
         """)
         self.btn_next.clicked.connect(self.on_next_clicked)
         self.btn_next.setEnabled(False)
-        layout.addWidget(self.btn_next, alignment=Qt.AlignmentFlag.AlignRight)
-
+        
+        action_layout.addWidget(self.btn_open)
+        action_layout.addWidget(self.btn_next)
+        
+        layout.addLayout(action_layout)
         self.setLayout(layout)
 
     def on_file_selected(self, file_path):
