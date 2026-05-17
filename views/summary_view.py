@@ -23,17 +23,17 @@ class SummaryView(QWidget):
 
         # Título
         lbl_title = QLabel("Sumario del Proyecto")
-        lbl_title.setStyleSheet("font-size: 24px; font-weight: bold; color: #2196F3;")
+        lbl_title.setObjectName("lblTitle")
         lbl_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(lbl_title)
 
         # Contenedor de resumen
         summary_frame = QFrame()
-        summary_frame.setStyleSheet("background-color: #f9f9f9; border: 1px solid #ccc; border-radius: 10px;")
+        summary_frame.setObjectName("summaryFrame")
         summary_layout = QVBoxLayout()
         
         self.lbl_info = QLabel("")
-        self.lbl_info.setStyleSheet("font-size: 16px; color: #333; border: none;")
+        self.lbl_info.setObjectName("lblSubtitle")
         summary_layout.addWidget(self.lbl_info)
         
         summary_frame.setLayout(summary_layout)
@@ -44,14 +44,14 @@ class SummaryView(QWidget):
         quality_layout.setSpacing(15)
         
         lbl_res = QLabel("Resolución:")
-        lbl_res.setStyleSheet("font-weight: bold; color: #333;")
+        lbl_res.setObjectName("lblSubtitle")
         self.combo_res = QComboBox()
         self.combo_res.addItems(["Original", "1920x1080 (FHD)", "1280x720 (HD)", "854x480 (SD)"])
         self.combo_res.currentIndexChanged.connect(self.update_model_options)
         self.combo_res.setCursor(Qt.CursorShape.PointingHandCursor)
         
         lbl_fps = QLabel("Fotogramas (FPS):")
-        lbl_fps.setStyleSheet("font-weight: bold; color: #333;")
+        lbl_fps.setObjectName("lblSubtitle")
         self.combo_fps = QComboBox()
         self.combo_fps.addItems(["15", "24", "30", "60"])
         self.combo_fps.setCurrentText("30")
@@ -90,7 +90,7 @@ class SummaryView(QWidget):
 
         self.lbl_status = QLabel("Listo para procesar.")
         self.lbl_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.lbl_status.setStyleSheet("color: #666;")
+        self.lbl_status.setObjectName("lblStatus")
         layout.addWidget(self.lbl_status)
 
         layout.addStretch()
@@ -99,28 +99,17 @@ class SummaryView(QWidget):
         btn_layout = QHBoxLayout()
         
         self.btn_back = QPushButton("⬅️ Regresar")
-        self.btn_back.setStyleSheet("background-color: #757575; color: white; font-weight: bold; padding: 15px; font-size: 16px; border-radius: 8px;")
+        self.btn_back.setObjectName("btnSecondary")
         self.btn_back.clicked.connect(self.back_requested.emit)
         
         self.btn_process = QPushButton("🚀 Procesar Slideshow")
         self.btn_process.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_process.setStyleSheet("""
-            QPushButton {
-                background-color: #4CAF50; color: white; font-weight: bold; padding: 15px; font-size: 16px; border-radius: 8px;
-            }
-            QPushButton:hover:!disabled { background-color: #45a049; }
-            QPushButton:disabled { background-color: #a5d6a7; }
-        """)
+        self.btn_process.setObjectName("btnPrimary")
         self.btn_process.clicked.connect(self.start_processing)
         
         self.btn_open_folder = QPushButton("📂 Abrir Carpeta")
         self.btn_open_folder.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_open_folder.setStyleSheet("""
-            QPushButton {
-                background-color: #2196F3; color: white; font-weight: bold; padding: 15px; font-size: 16px; border-radius: 8px;
-            }
-            QPushButton:hover { background-color: #1976D2; }
-        """)
+        self.btn_open_folder.setObjectName("btnInfo")
         self.btn_open_folder.clicked.connect(self.open_output_folder)
         self.btn_open_folder.hide()
         

@@ -26,12 +26,12 @@ class SlideshowView(QWidget):
         left_panel = QVBoxLayout()
         
         lbl_title_left = QLabel("Visor del Slide")
-        lbl_title_left.setStyleSheet("font-size: 20px; font-weight: bold;")
+        lbl_title_left.setObjectName("lblTitle")
         left_panel.addWidget(lbl_title_left)
 
         self.preview_label = QLabel("Selecciona un slide de la lista")
         self.preview_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.preview_label.setStyleSheet("background-color: #000; color: white; border: 2px solid #cfd8dc; border-radius: 8px;")
+        self.preview_label.setObjectName("videoViewer")
         self.preview_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.preview_label.setMinimumSize(1, 1)
         left_panel.addWidget(self.preview_label, stretch=1)
@@ -43,7 +43,7 @@ class SlideshowView(QWidget):
         right_panel.setSpacing(15)
         
         lbl_title_right = QLabel("Configuración")
-        lbl_title_right.setStyleSheet("font-size: 20px; font-weight: bold;")
+        lbl_title_right.setObjectName("lblTitle")
         right_panel.addWidget(lbl_title_right)
 
         # 1. Efecto Global
@@ -62,7 +62,7 @@ class SlideshowView(QWidget):
         self.combo_effect.currentIndexChanged.connect(self.on_effect_changed)
         
         self.btn_play_all = QPushButton("▶️ Play All")
-        self.btn_play_all.setStyleSheet("background-color: #ff9800; font-weight: bold; padding: 6px;")
+        self.btn_play_all.setObjectName("btnWarning")
         self.btn_play_all.clicked.connect(self.play_all)
         
         effect_layout.addWidget(lbl_effect)
@@ -72,7 +72,7 @@ class SlideshowView(QWidget):
 
         # 2. Propiedades del Slide Seleccionado
         props_frame = QFrame()
-        props_frame.setStyleSheet("background-color: #ffffff; border: 1px solid #cfd8dc; border-radius: 8px;")
+        props_frame.setObjectName("slideFrame")
         props_layout = QVBoxLayout(props_frame)
         
         time_layout = QHBoxLayout()
@@ -90,19 +90,13 @@ class SlideshowView(QWidget):
         actions_layout = QHBoxLayout()
         self.btn_preview = QPushButton("👁️ Previsualizar")
         self.btn_preview.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_preview.setStyleSheet("""
-            QPushButton { background-color: #9C27B0; font-size: 13px; padding: 8px; }
-            QPushButton:hover:!disabled { background-color: #7B1FA2; }
-        """)
+        self.btn_preview.setObjectName("btnInfo")
         self.btn_preview.clicked.connect(self.preview_transition)
         self.btn_preview.setEnabled(False)
         
         self.btn_delete = QPushButton("🗑️ Eliminar")
         self.btn_delete.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_delete.setStyleSheet("""
-            QPushButton { background-color: #f44336; font-size: 13px; padding: 8px; }
-            QPushButton:hover:!disabled { background-color: #d32f2f; }
-        """)
+        self.btn_delete.setObjectName("btnDanger")
         self.btn_delete.clicked.connect(self.delete_slide)
         self.btn_delete.setEnabled(False)
         
@@ -127,17 +121,12 @@ class SlideshowView(QWidget):
         # Botones de Navegación
         nav_layout = QHBoxLayout()
         self.btn_back = QPushButton("⬅️ Regresar")
-        self.btn_back.setStyleSheet("background-color: #757575; color: white; font-weight: bold; padding: 12px; font-size: 14px;")
+        self.btn_back.setObjectName("btnSecondary")
         self.btn_back.clicked.connect(self.back_requested.emit)
         
         self.btn_next = QPushButton("Continuar a Resumen ➡️")
         self.btn_next.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_next.setStyleSheet("""
-            QPushButton {
-                background-color: #4CAF50; color: white; font-weight: bold; padding: 12px; font-size: 14px;
-            }
-            QPushButton:hover:!disabled { background-color: #45a049; }
-        """)
+        self.btn_next.setObjectName("btnPrimary")
         self.btn_next.clicked.connect(self.on_next_clicked)
         
         nav_layout.addWidget(self.btn_back)
@@ -247,7 +236,9 @@ class SlideshowView(QWidget):
         self.preview_thread.finished.connect(self.on_preview_finished)
         
         self.btn_play_all.setText("⏹️ Stop")
-        self.btn_play_all.setStyleSheet("background-color: #f44336; font-weight: bold; padding: 6px;")
+        self.btn_play_all.setObjectName("btnDanger")
+        self.btn_play_all.style().unpolish(self.btn_play_all)
+        self.btn_play_all.style().polish(self.btn_play_all)
         self.btn_play_all.clicked.disconnect()
         self.btn_play_all.clicked.connect(self.stop_play_all)
         
@@ -269,7 +260,9 @@ class SlideshowView(QWidget):
 
     def on_preview_finished(self):
         self.btn_play_all.setText("▶️ Play All")
-        self.btn_play_all.setStyleSheet("background-color: #ff9800; font-weight: bold; padding: 6px;")
+        self.btn_play_all.setObjectName("btnWarning")
+        self.btn_play_all.style().unpolish(self.btn_play_all)
+        self.btn_play_all.style().polish(self.btn_play_all)
         self.btn_play_all.clicked.disconnect()
         self.btn_play_all.clicked.connect(self.play_all)
         

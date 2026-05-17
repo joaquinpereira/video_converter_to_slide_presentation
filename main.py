@@ -55,99 +55,7 @@ class MainWindow(QMainWindow):
         self.slideshow_view.data_changed.connect(self.trigger_autosave)
         self.summary_view.data_changed.connect(self.trigger_autosave)
         
-        # Estilos globales (Modernos y limpios)
-        self.setStyleSheet("""
-            QMainWindow {
-                background-color: #f0f2f5;
-            }
-            QLabel {
-                color: #2c3e50;
-            }
-            QLineEdit {
-                padding: 12px;
-                border: 1px solid #cfd8dc;
-                border-radius: 6px;
-                background-color: white;
-                color: #2c3e50;
-                font-size: 14px;
-            }
-            QDoubleSpinBox {
-                padding: 12px;
-                border: 1px solid #cfd8dc;
-                border-radius: 6px;
-                background-color: white;
-                color: #2c3e50;
-                font-size: 14px;
-            }
-            QPushButton {
-                border-radius: 6px;
-                border: none;
-                color: white;
-            }
-            QPushButton:disabled {
-                background-color: #b0bec5;
-            }
-            QComboBox {
-                padding: 12px;
-                border: 1px solid #cfd8dc;
-                border-radius: 6px;
-                background-color: white;
-                color: #2c3e50;
-                font-size: 14px;
-            }
-            QComboBox::drop-down {
-                border: 0px;
-            }
-            QComboBox QAbstractItemView {
-                background-color: white;
-                color: #2c3e50;
-                selection-background-color: #2196F3;
-                selection-color: white;
-            }
-            QMessageBox {
-                background-color: #ffffff;
-            }
-            QMessageBox QLabel {
-                color: #2c3e50;
-            }
-            QMessageBox QPushButton {
-                background-color: #2196F3;
-                color: white;
-                min-width: 80px;
-                padding: 5px 15px;
-            }
-            QCheckBox {
-                color: #2c3e50;
-                font-size: 15px;
-                font-weight: bold;
-            }
-            QCheckBox::indicator {
-                width: 18px;
-                height: 18px;
-                border: 2px solid #90a4ae;
-                border-radius: 4px;
-                background-color: white;
-            }
-            QCheckBox::indicator:checked {
-                background-color: #2196F3;
-                border: 2px solid #2196F3;
-            }
-            QListWidget {
-                background-color: #ffffff;
-                border: 1px solid #cfd8dc;
-                border-radius: 8px;
-            }
-            QListWidget::item {
-                color: #2c3e50;
-                padding: 5px;
-            }
-            QListWidget::item:selected {
-                background-color: #e3f2fd;
-                border: 1px solid #2196F3;
-                border-radius: 4px;
-                color: #1565c0;
-            }
-        """)
+        self.setObjectName("mainBackground")
 
     def setup_menu(self):
         menu_bar = self.menuBar()
@@ -171,6 +79,12 @@ class MainWindow(QMainWindow):
         action_save_as = QAction("Guardar como...", self)
         action_save_as.triggered.connect(self.save_project_as)
         file_menu.addAction(action_save_as)
+        
+        view_menu = menu_bar.addMenu("Ver")
+        theme_action = QAction("🎨 Cambiar Tema...", self)
+        theme_action.setShortcut("Ctrl+K")
+        theme_action.triggered.connect(self.open_theme_selector)
+        view_menu.addAction(theme_action)
 
     def new_project(self):
         resp = QMessageBox.question(self, "Nuevo", "¿Crear nuevo proyecto? Los cambios no guardados se perderán.",
@@ -211,6 +125,14 @@ class MainWindow(QMainWindow):
             self.save_project_as()
         else:
             ProjectManager.save_project(self.model)
+
+    def open_theme_selector(self):
+        from views.theme_selector import ThemeSelectorDialog
+        dialog = ThemeSelectorDialog(QApplication.instance(), self)
+        if self.isVisible():
+            geom = self.geometry()
+            dialog.move(geom.center() - dialog.rect().center())
+        dialog.exec()
 
     def save_project_as(self):
         if not self.model.project_name:
@@ -255,10 +177,10 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     
-    # Fuentes más modernas
-    font = app.font()
-    font.setFamily("Segoe UI")
-    app.setFont(font)
+    # Aplicar el tema global guardado
+    from theme_manager import ThemeManager
+    current_theme = ThemeManager.get_current_theme_name()
+    ThemeManager.apply_theme(app, current_theme, save=False)
     
     window = MainWindow()
     window.show()

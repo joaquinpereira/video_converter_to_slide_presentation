@@ -50,7 +50,7 @@ class ExtractorView(QWidget):
         
         self.video_label = VideoLabel("Cargando video...")
         self.video_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.video_label.setStyleSheet("background-color: black; color: white; border-radius: 8px;")
+        self.video_label.setObjectName("videoViewer")
         self.video_label.setMinimumSize(1, 1)
         self.video_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.video_label.double_clicked.connect(self.toggle_play)
@@ -61,16 +61,12 @@ class ExtractorView(QWidget):
         self.slider.setRange(0, 100)
         self.slider.sliderMoved.connect(self.set_position)
         self.slider.sliderPressed.connect(self.pause_video)
-        self.slider.setStyleSheet("""
-            QSlider::groove:horizontal { border: 1px solid #bbb; background: #e0e0e0; height: 12px; border-radius: 6px; }
-            QSlider::handle:horizontal { background: #2196F3; border: 1px solid #1976D2; width: 24px; margin: -6px 0; border-radius: 12px; }
-            QSlider::handle:horizontal:hover { background: #4CAF50; }
-        """)
+        self.slider.setObjectName("timelineSlider")
         self.slider.setCursor(Qt.CursorShape.PointingHandCursor)
         timeline_layout.addWidget(self.slider)
         
         self.lbl_time = QLabel("00:00 / 00:00")
-        self.lbl_time.setStyleSheet("font-weight: bold; color: #2c3e50; font-size: 14px; min-width: 90px;")
+        self.lbl_time.setObjectName("lblTime")
         self.lbl_time.setAlignment(Qt.AlignmentFlag.AlignCenter)
         timeline_layout.addWidget(self.lbl_time)
         left_panel.addLayout(timeline_layout)
@@ -79,16 +75,10 @@ class ExtractorView(QWidget):
         self.btn_play_pause = QPushButton("▶️ Play")
         self.btn_play_pause.clicked.connect(self.toggle_play)
         self.btn_play_pause.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_play_pause.setStyleSheet("""
-            QPushButton { background-color: #2196F3; color: white; padding: 10px 20px; font-weight: bold; font-size: 14px; }
-            QPushButton:hover { background-color: #1976D2; }
-        """)
+        self.btn_play_pause.setObjectName("btnInfo")
         
         self.btn_snapshot = QPushButton("📸 Tomar Snapshot")
-        self.btn_snapshot.setStyleSheet("""
-            QPushButton { background-color: #ff9800; color: white; font-weight: bold; padding: 10px 20px; font-size: 14px; }
-            QPushButton:hover { background-color: #fb8c00; }
-        """)
+        self.btn_snapshot.setObjectName("btnWarning")
         self.btn_snapshot.clicked.connect(self.take_snapshot)
         self.btn_snapshot.setCursor(Qt.CursorShape.PointingHandCursor)
         
@@ -104,7 +94,7 @@ class ExtractorView(QWidget):
         right_panel.setSpacing(10)
 
         lbl_snapshots = QLabel("Snapshots Tomados")
-        lbl_snapshots.setStyleSheet("font-weight: bold; font-size: 18px; color: #2c3e50;")
+        lbl_snapshots.setObjectName("lblSubtitle")
         right_panel.addWidget(lbl_snapshots)
 
         self.list_snapshots = QListWidget()
@@ -113,25 +103,19 @@ class ExtractorView(QWidget):
         self.list_snapshots.setMinimumWidth(280)
         self.list_snapshots.setIconSize(QSize(120, 67))
         self.list_snapshots.setSpacing(10)
-        self.list_snapshots.setStyleSheet("background-color: white; border-radius: 8px; border: 1px solid #cfd8dc; padding: 8px;")
+        self.list_snapshots.setObjectName("snapshotList")
         self.list_snapshots.itemSelectionChanged.connect(self.on_snapshot_selected)
         right_panel.addWidget(self.list_snapshots, stretch=1)
 
         self.btn_delete_snap = QPushButton("🗑️ Eliminar Snapshot")
         self.btn_delete_snap.setEnabled(False)
-        self.btn_delete_snap.setStyleSheet("""
-            QPushButton { background-color: #f44336; padding: 10px; font-weight: bold; color: white; }
-            QPushButton:hover:!disabled { background-color: #d32f2f; }
-        """)
+        self.btn_delete_snap.setObjectName("btnDanger")
         self.btn_delete_snap.clicked.connect(self.delete_snapshot)
         right_panel.addWidget(self.btn_delete_snap)
 
         self.btn_next = QPushButton("Configurar Slides ➡️")
         self.btn_next.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_next.setStyleSheet("""
-            QPushButton { background-color: #4CAF50; color: white; font-weight: bold; padding: 12px 20px; font-size: 14px; }
-            QPushButton:hover { background-color: #45a049; }
-        """)
+        self.btn_next.setObjectName("btnPrimary")
         self.btn_next.clicked.connect(self.on_next_clicked)
         right_panel.addWidget(self.btn_next)
 

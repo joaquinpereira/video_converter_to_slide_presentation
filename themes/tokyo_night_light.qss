@@ -1,0 +1,65 @@
+/* Tokio Night Light THEME */
+QWidget {
+    background-color: #d5d6db;
+    color: #3760bf;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+QWidget#mainBackground {
+    background-color: #c4c8da;
+}
+
+/* Títulos */
+QLabel#lblTitle { font-size: 24px; font-weight: bold; color: #0f4b6e; }
+QLabel#lblSubtitle { font-weight: bold; font-size: 18px; color: #34548a; }
+QLabel#lblTime { font-weight: bold; color: #3760bf; font-size: 14px; min-width: 90px; }
+QLabel#lblStatus { color: #9699a3; }
+
+/* Visores */
+QLabel#videoViewer { background-color: #000000; color: #3760bf; border-radius: 8px; border: 1px solid #a8aecb; }
+QListWidget#snapshotList { background-color: #e1e2e7; border-radius: 8px; border: 1px solid #a8aecb; padding: 8px; color: #3760bf; }
+
+/* Botones Básicos */
+QPushButton { background-color: #b7bdcf; color: #3760bf; border-radius: 8px; padding: 10px 20px; font-weight: bold; font-size: 14px; }
+QPushButton:hover { background-color: #a4aabd; }
+QPushButton:disabled { background-color: #d5d6db; color: #9ca1b5; }
+
+/* Botones Especializados */
+QPushButton#btnPrimary { background-color: #0f4b6e; color: #ffffff; }
+QPushButton#btnPrimary:hover { background-color: #0c3b57; }
+QPushButton#btnPrimary:disabled { background-color: #d5d6db; color: #9ca1b5; }
+
+QPushButton#btnInfo { background-color: #2e7de9; color: white; }
+QPushButton#btnInfo:hover { background-color: #2564ba; }
+
+QPushButton#btnWarning { background-color: #8c6c3e; color: white; }
+QPushButton#btnWarning:hover { background-color: #705631; }
+
+QPushButton#btnDanger { background-color: #8c4351; color: white; }
+QPushButton#btnDanger:hover:!disabled { background-color: #703541; }
+
+QPushButton#btnSecondary { background-color: #5a6a96; color: white; }
+QPushButton#btnSecondary:hover { background-color: #485578; }
+
+/* Slider */
+QSlider::groove:horizontal { border: 1px solid #a8aecb; background: #e1e2e7; height: 12px; border-radius: 6px; }
+QSlider::handle:horizontal { background: #0f4b6e; border: 1px solid #0c3b57; width: 24px; margin: -6px 0; border-radius: 12px; }
+QSlider::handle:horizontal:hover { background: #0c3b57; }
+
+/* Checkboxes */
+QCheckBox { color: #3760bf; font-size: 15px; font-weight: bold; }
+QCheckBox::indicator { width: 18px; height: 18px; border: 2px solid #a8aecb; border-radius: 4px; background-color: #e1e2e7; }
+QCheckBox::indicator:checked { background-color: #0f4b6e; border: 2px solid #0f4b6e; }
+
+/* Modales y Paneles */
+QFrame#summaryFrame, QFrame#slideFrame, QFrame#dropArea { background-color: #e1e2e7; border: 2px dashed #a8aecb; border-radius: 10px; }
+QFrame#dropArea:hover { background-color: #e1e2e7; border-color: #0f4b6e; }
+
+QMessageBox { background-color: #d5d6db; }
+QMessageBox QLabel { color: #3760bf; font-size: 14px; }
+QMessageBox QPushButton { background-color: #0f4b6e; color: #ffffff; min-width: 80px; padding: 5px 15px; font-size: 14px; }
+
+/* Controles */
+QComboBox, QLineEdit, QSpinBox, QDoubleSpinBox { padding: 8px; border: 1px solid #a8aecb; border-radius: 4px; background-color: #e1e2e7; color: #3760bf; }
+QComboBox:disabled, QSpinBox:disabled, QDoubleSpinBox:disabled { background-color: #d5d6db; color: #9ca1b5; }

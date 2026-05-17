@@ -9,21 +9,11 @@ class DropArea(QFrame):
     def __init__(self):
         super().__init__()
         self.setAcceptDrops(True)
-        self.setStyleSheet("""
-            QFrame {
-                border: 2px dashed #aaa;
-                border-radius: 10px;
-                background-color: #f9f9f9;
-            }
-            QFrame:hover {
-                background-color: #e6f7ff;
-                border-color: #1890ff;
-            }
-        """)
+        self.setObjectName("dropArea")
         layout = QVBoxLayout()
         self.label = QLabel("Arrastra y suelta tu video aquí\no haz clic para explorar")
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.label.setStyleSheet("border: none; color: #555; font-size: 14px;")
+        self.label.setObjectName("lblSubtitle")
         layout.addWidget(self.label)
         self.setLayout(layout)
 
@@ -65,7 +55,7 @@ class MainView(QWidget):
 
         # Título
         title = QLabel("Configuración Inicial")
-        title.setStyleSheet("font-size: 24px; font-weight: bold; color: #333;")
+        title.setObjectName("lblTitle")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
 
@@ -75,7 +65,7 @@ class MainView(QWidget):
         layout.addWidget(self.drop_area, stretch=1)
 
         self.lbl_video_path = QLabel("Video: Ninguno seleccionado")
-        self.lbl_video_path.setStyleSheet("color: #888; font-size: 12px;")
+        self.lbl_video_path.setObjectName("lblStatus")
         layout.addWidget(self.lbl_video_path)
 
         # Nombre del Proyecto
@@ -97,7 +87,7 @@ class MainView(QWidget):
         self.txt_save_location.setReadOnly(True)
         self.txt_save_location.setPlaceholderText("Selecciona dónde guardar...")
         btn_browse = QPushButton("Explorar...")
-        btn_browse.setStyleSheet("background-color: #757575; color: white; padding: 12px 20px; font-weight: bold; border-radius: 6px; font-size: 14px;")
+        btn_browse.setObjectName("btnSecondary")
         btn_browse.setCursor(Qt.CursorShape.PointingHandCursor)
         btn_browse.clicked.connect(self.browse_save_location)
         sl_layout.addWidget(sl_label)
@@ -111,23 +101,12 @@ class MainView(QWidget):
         
         self.btn_open = QPushButton("📂 Abrir Proyecto")
         self.btn_open.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_open.setStyleSheet("""
-            QPushButton {
-                background-color: #2196F3; color: white; padding: 12px; font-weight: bold; font-size: 16px; border-radius: 6px;
-            }
-            QPushButton:hover { background-color: #1976D2; }
-        """)
+        self.btn_open.setObjectName("btnInfo")
         self.btn_open.clicked.connect(self.open_project_requested.emit)
         
         self.btn_next = QPushButton("🚀 Crear Proyecto")
         self.btn_next.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.btn_next.setStyleSheet("""
-            QPushButton {
-                background-color: #4CAF50; color: white; font-weight: bold; padding: 12px; font-size: 16px; border-radius: 6px;
-            }
-            QPushButton:disabled { background-color: #a5d6a7; color: #f1f1f1; }
-            QPushButton:hover:!disabled { background-color: #45a049; }
-        """)
+        self.btn_next.setObjectName("btnPrimary")
         self.btn_next.clicked.connect(self.on_next_clicked)
         self.btn_next.setEnabled(False)
         
